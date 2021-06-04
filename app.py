@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import sys
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ShujiKatoMBPro@localhost:5432/todoapp'
 db = SQLAlchemy(app)  # define a db object which link SQLAlchemy to Flask app
@@ -28,7 +27,7 @@ def create_todo():
     error = False
     body = {}
     try:
-        description = request.form.get_json()['description']
+        description = request.get_json()['description']  # request.get_json()が正しい
         todo = Todo(description=description)
         db.session.add(todo)
         db.session.commit()
