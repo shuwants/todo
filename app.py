@@ -10,7 +10,7 @@ db = SQLAlchemy(app)  # define a db object which link SQLAlchemy to Flask app
 migrate = Migrate(app, db)
 
 
-class Todo(db.Model):  # このコードはtableを作らない。最初にtodoapp dbにこの3つのコラムを作ったtodos tableが必要。
+class Todo(db.Model):  # このコードはtableを作らない。最初にtodoapp dbにこの3つのコラムを作ったtodos tableが必要＆ここがModel
     __tablename__ = 'todos'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
@@ -61,4 +61,4 @@ def set_completed_todo(todo_id):  # Ajax requestから来る completed property�
 
 @app.route('/')
 def index():  # matching the name of route and as well as the name of route handler(@app.route('/')).
-    return render_template('index.html', data=Todo.query.all())
+    return render_template('index.html', data=Todo.query.order_by('id').all())
