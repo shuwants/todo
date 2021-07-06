@@ -22,7 +22,9 @@ class Todo(db.Model):  # このコードはtableを作らない。最初にtodoa
 
 # db.create_all()  # flask db migrateでdbを作るから、このコードは不要。
 
-
+# note: more conventionally, we would write a
+# POST endpoint to /todos for the create endpoint:
+# @app.route('/todos', method=['POST'])
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
     error = False
