@@ -5,6 +5,7 @@ import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ShujiKatoMBPro@localhost:5432/todoapp'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)  # define a db object which link SQLAlchemy to Flask app
 
 migrate = Migrate(app, db)
@@ -28,9 +29,11 @@ def create_todo():
     body = {}
     try:
         description = request.get_json()['description']  # request.get_json()が正しい
-        todo = Todo(description=description)
+        todo = Todo(description=description, completed=False)
         db.session.add(todo)
         db.session.commit()
+        body['id'] = todo.id
+        body['completed'] = todo.completed
         body['description'] = todo.description
     except:
         error = True
@@ -59,6 +62,18 @@ def set_completed_todo(todo_id):  # Ajax requestから来る completed property�
     return redirect({url_for('index')})
 
 
+@app.route('/todos/<todo_id>', methods=['DELETE'])
+def delete_todo(todo_id):
+    try:
+        Todo.query.filter_by(id=todo_id).delete()
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({'success': True})
+
+
 @app.route('/')
 def index():  # matching the name of route and as well as the name of route handler(@app.route('/')).
-    return render_template('index.html', data=Todo.query.order_by('id').all())
+    return render_template('index.html', todos=Todo.query.order_by('id').all())

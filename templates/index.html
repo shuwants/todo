@@ -32,15 +32,30 @@
       <input type="submit" value="Create" />
     </form>
     <ul id="todos">
-      {% for d in data %}
+      {% for todo in todos %}
       <li>
-          <input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />
-          {{ d.description }}
+          <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
+          {{ todo.description }}
+          <button class="delete-button" data-id="{{ todo.id }}">x</button>
       </li>
       {% endfor %}
     </ul>
     <script>
-      descInput = document.getElementById('description'); <!-- addの為この行が必要 -->
+      const deleteBtns = document.querySelectorAll('.delete-button');
+      for (let i = 0; i < deleteBtns.length; i++) {
+          const btn = deleteBtns[i];
+          btn.onclick = function(e) {
+              const todoId = e.target.dataset['id'];
+              fetch('/todos/' + todoId, {
+                  method: 'DELETE'
+              })
+              .then(function() {
+                  const item = e.target.parentElement;
+                  item.remove();
+              })
+          }
+      }
+
       <!-- ↓ checkbox を更新すれば todos/set-completed にPOST requestを送る Ajaxで -->
       const checkboxes = document.querySelectorAll('.check-completed');
       console.log(checkboxes)
@@ -67,6 +82,7 @@
         })
           }
       }
+      const descInput = document.getElementById('description'); <!-- addの為この行が必要 -->
       document.getElementById('form').onsubmit = function(e) {
         e.preventDefault();
         const desc = descInput.value;
@@ -83,12 +99,27 @@
         .then(response => response.json())
         .then(jsonResponse => {
           console.log('response', jsonResponse);
-          li = document.createElement('li');
-          li.innerText = desc;
+          const li = document.createElement('li');
+          const checkbox = document.creteElement('input');
+          checkbox.className = 'check-completed';
+          checkbox.type = 'checkbox';
+          checkbox.setAttribute('data-id', jsonResponse.id);
+          li.appendChild(checkbox);
+
+          const text = document.createTextNode(' ' + jsonResponse.description);
+          li.appendChild(text);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-button';
+          deleteBtn.setAttribute('data-id', jsonResponse.id);
+          deleteBtn.innerHTML = '&cross;';
+          li.appendChild(deleteBtn);
+
           document.getElementById('todos').appendChild(li);
           document.getElementById('error').className = 'hidden';
         })
         .catch(function() {
+          console.error('Error occurred');
           document.getElementById('error').className = '';
         })
       }
