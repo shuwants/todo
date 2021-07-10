@@ -96,10 +96,12 @@
             'Content-Type': 'application/json'
           }
         })
-        .then(response => response.json())
+        .then(response => {
+            return response.json();  <!-- ここの"return"が抜けるとブラウザに反映されないから注意 -->
+        })
         .then(jsonResponse => {
           const li = document.createElement('li');
-          const checkbox = document.creteElement('input');
+          const checkbox = document.createElement('input');
           checkbox.className = 'check-completed';
           checkbox.type = 'checkbox';
           checkbox.setAttribute('data-id', jsonResponse.id);
