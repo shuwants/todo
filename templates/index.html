@@ -82,9 +82,9 @@
         })
           }
       }
-      const descInput = document.getElementById('description'); <!-- addの為この行が必要 -->
       document.getElementById('form').onsubmit = function(e) {
         e.preventDefault();
+        const descInput = document.getElementById('description'); <!-- addの為この行が必要 -->
         const desc = descInput.value;
         descInput.value = '';
         fetch('/todos/create', {
@@ -93,12 +93,11 @@
             'description': desc,
           }),
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           }
         })
         .then(response => response.json())
         .then(jsonResponse => {
-          console.log('response', jsonResponse);
           const li = document.createElement('li');
           const checkbox = document.creteElement('input');
           checkbox.className = 'check-completed';
