@@ -24,6 +24,7 @@ class Todo(db.Model):  # このコードはtableを作らない。最初にtodoa
 
 # db.create_all()  # flask db migrateでdbを作るから、このコードは不要。
 
+
 class TodoList(db.Model):
     __tablename__ = 'todolists'
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +85,12 @@ def delete_todo(todo_id):
     return jsonify({'success': True})
 
 
+@app.route('/lists/<list_id>')
+def get_list_todos(list_id):  # matching the name of route and as well as the name of route handler(@app.route('/')).
+    return render_template('index.html', lists=TodoList.query.all(), active_list=TodoList.query.get(list_id),
+                           todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+
+
 @app.route('/')
-def index():  # matching the name of route and as well as the name of route handler(@app.route('/')).
-    return render_template('index.html', todos=Todo.query.order_by('id').all())
+def index():
+    return redirect(url_for('get_list_todos', list_id=1))
